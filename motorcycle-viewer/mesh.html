@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Three.js Grid Scene</title>
+    <style>
+      body { margin: 0; overflow: hidden; }
+      canvas { display: block; }
+      #ui {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(255,255,255,0.85);
+        padding: 10px;
+        border-radius: 6px;
+        font-family: sans-serif;
+      }
+      #ui label, #ui select, #ui input, #ui button {
+        margin-bottom: 8px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="ui">
+      <label>Background Color:
+        <input type="color" id="bgColor" value="#202020">
+      </label>
+      <label>Theme:
+        <select id="themeSelect">
+           <option>Please select</option>
+          <option value="studio">Studio</option>
+          <option value="outdoor">Night</option>
+        
+        </select>
+      </label>
+      <button id="envBtn">Toggle Environment</button>
+    </div>
+    <script type="module" src="mesh.js"></script>
+  </body>
+</html>

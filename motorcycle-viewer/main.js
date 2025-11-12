@@ -9,14 +9,16 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
   60,
   window.innerWidth / window.innerHeight,
-  0.1,
-  100
+  0.01, // near plane (was 0.1)
+  1000  // far plane (was 100)
 );
-camera.position.set(2, 1.5, 4);
+
+camera.position.set(1.5, 1.2, 2.5);
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 document.body.appendChild(renderer.domElement);
@@ -42,10 +44,21 @@ loader.load(
     motorcycle.scale.set(5,5,5);
     motorcycle.position.set(0, 2, 5);
     scene.add(motorcycle);
+
+    const box = new THREE.Box3().setFromObject(motorcycle);
+const size = box.getSize(new THREE.Vector3()).length();
+const center = box.getCenter(new THREE.Vector3());
+
+controls.target.copy(center);
+camera.position.copy(center).add(new THREE.Vector3(0, size * 0.5, size));
+camera.lookAt(center);
+controls.update();
   },
   undefined,
   (err) => console.error("Model load error:", err)
 );
+
+
 
 
 const floor = new THREE.Mesh(
@@ -66,11 +79,33 @@ spotLight.position.set(5, 10, 5);
 spotLight.castShadow = true;
 scene.add(spotLight);
 
+function changeColor(colorName) {
+  if (!motorcycle) return;
+
+  const newColor = new THREE.Color(colorName);
+
+  motorcycle.traverse((child) => {
+    if (child.isMesh) {
+      if (child.material) {
+        child.material.color = newColor;
+        child.material.needsUpdate = true;
+        child.material = new THREE.MeshStandardMaterial({ color: newColor });
+
+      }
+    }
+  });
+}
+window.changeColor = changeColor;
+
+controls.target.set(0, 1, 0);       // center the camera on the bike
+
+
+
 
 // // Animation Loop
 function animate() {
   requestAnimationFrame(animate);
-  if (motorcycle) motorcycle.rotation.y += 0.005;
+  if (motorcycle) motorcycle.rotation.y += 0.004;
   controls.update();
   renderer.render(scene, camera);
 }
@@ -81,4 +116,5 @@ window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
 });
