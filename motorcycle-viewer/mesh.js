@@ -46,6 +46,11 @@ let grid = new THREE.GridHelper(40, 40, 0xffffff, 0x888888);
 //grid.rotation.x = Math.PI / 2;
 gridParent.add(grid);
 
+//cache hdri
+const envCache = {};
+new EXRLoader().load('./textures/indoor.exr', (tex) => envCache['studio'] = tex);
+new EXRLoader().load('./textures/outdoor.exr', (tex) => envCache['outdoor'] = tex);
+
 //apply HDRI
 const hdris = {
   studio: "./textures/indoor.exr",
@@ -56,7 +61,7 @@ const hdris = {
 
 function applyHDRI(name) {
   const path = hdris[name];
-  if (!path) return;
+  if (!envCache[name]) return;
 
 //   new RGBELoader()
 //     .setDataType(THREE.UnsignedByteType)
@@ -68,13 +73,12 @@ function applyHDRI(name) {
 //       scene.environment = texture; // gives realistic reflections
 //     });
 
-new EXRLoader()
-  .load(path, (texture) => {
+  const texture = envCache[name];
     texture.mapping = THREE.EquirectangularReflectionMapping;
     scene.background = texture;
     scene.environment = texture;
-  });
-}
+  };
+
 
 
 // ✅ Room-like Background (CubeTexture)
